@@ -1,5 +1,5 @@
 CC=g++
-CFLAGS=-c -Wall -std=c++17
+CFLAGS=-c -g -Wall -std=c++17
 LDFLAGS=-ldl -rdynamic
 
 run.exe: main.o DynamicAllocationTroubleshooter.o
@@ -7,6 +7,6 @@ run.exe: main.o DynamicAllocationTroubleshooter.o
 main.o: main.cpp
 	$(CC) $(CFLAGS) main.cpp
 DynamicAllocationTroubleshooter.o: DynamicAllocationTroubleshooter/DynamicAllocationTroubleshooter.cpp DynamicAllocationTroubleshooter/DynamicAllocationTroubleshooter.h
-	cd DynamicAllocationTroubleshooter; g++ -std=c++17 -c DynamicAllocationTroubleshooter.cpp; mv DynamicAllocationTroubleshooter.o ..; cd ..;
+	cd DynamicAllocationTroubleshooter; $(CC) $(CFLAGS) DynamicAllocationTroubleshooter.cpp; mv DynamicAllocationTroubleshooter.o ..; cd ..;
 clean:
 	rm *.o *.exe
