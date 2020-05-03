@@ -7,8 +7,8 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # Either specify BOOST_ROOT or BOOST_INCLUDEDIR and BOOST_LIBRARYDIR.
 # I am using "MinGW Distro" in this example, but also a relative path, e. g.
 # "vendor/boost" can be specified.
-#set (BOOST_ROOT "C:/MinGW")
 set (BOOST_INCLUDEDIR "/usr/include/boost")
+#set (BOOST_ROOT "C:/MinGW")
 #set (BOOST_LIBRARYDIR "C:/MinGW/lib")
 set (Boost_NO_SYSTEM_PATHS ON)
 set (Boost_USE_MULTITHREADED ON)

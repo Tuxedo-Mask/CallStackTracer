@@ -4,3 +4,4 @@ g-tests/CMakeCache.txt
 g-tests/CMakeFiles/
 g-tests/Makefile
 g-tests/cmake_install.cmake
+.vscode/*

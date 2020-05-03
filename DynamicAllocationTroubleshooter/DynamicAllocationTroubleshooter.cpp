@@ -65,7 +65,8 @@ void* operator new(size_t requestedSize)
             } BOOST_SCOPE_EXIT_END
             std::cout << "Global operator new is called with requested size = " << requestedSize << std::endl;
             auto stackTrace = boost::stacktrace::stacktrace(allocationTroubleshooter.getFramesToSkip(), allocationTroubleshooter.getFramesMaxDepth());
-            std::cout << stackTrace;
+            const auto& traceString = boost::stacktrace::detail::to_string(&stackTrace.as_vector()[0], stackTrace.size());
+            std::cout << traceString;
         }
 
         return allocationAddress;
@@ -88,7 +89,8 @@ void operator delete(void* ptr) noexcept
         std::cout << "Global operator delete is called" << std::endl;
         
         auto stackTrace = boost::stacktrace::stacktrace(allocationTroubleshooter.getFramesToSkip(), allocationTroubleshooter.getFramesMaxDepth());
-        std::cout << stackTrace;
+        const auto& traceString = boost::stacktrace::detail::to_string(&stackTrace.as_vector()[0], stackTrace.size());
+        std::cout << traceString;
     }
     std::free(ptr);
 }

@@ -1,0 +1,4 @@
+1. Support caller line number printing
+2. Give a way to enable/disable logging
+3. Give a way to redirrect output
+4. Add tracing info collecting mechanism

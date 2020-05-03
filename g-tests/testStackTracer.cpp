@@ -2,9 +2,16 @@
 
 #include "../DynamicAllocationTroubleshooter/DynamicAllocationTroubleshooter.h"
 
-TEST(TestStackTracer, EnableTesting)
+TEST(TestStackTracer, StartDisabledTest)
 {
     EXPECT_FALSE(DynamicAllocationTroubleshooter::getInstance().isMonitoringEnabled());
+}
+
+TEST(TestStackTracer, EnableTest)
+{
+    auto& allocationTroubleshooter = DynamicAllocationTroubleshooter::getInstance();
+    allocationTroubleshooter.enableMonitoring();
+    EXPECT_TRUE(DynamicAllocationTroubleshooter::getInstance().isMonitoringEnabled());
 }
 
 int main(int argc, char** argv)

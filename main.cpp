@@ -4,13 +4,14 @@
 #include "ContainersWithCustomAllocator/CustomAllocatedContainers.h"
 #include "DynamicAllocationTroubleshooter/DynamicAllocationTroubleshooter.h"
 
+
 int main()
 {
     std::cout << "Welcome to the real world!" << std::endl;
 
     auto& allocationTroubleshooter = DynamicAllocationTroubleshooter::getInstance();
     allocationTroubleshooter.setFramesToSkip(1);
-    allocationTroubleshooter.setFramesMaxDepth(1);
+    allocationTroubleshooter.setFramesMaxDepth(100);
     allocationTroubleshooter.enableMonitoring();
     /*int* testPtr = new int;
     
