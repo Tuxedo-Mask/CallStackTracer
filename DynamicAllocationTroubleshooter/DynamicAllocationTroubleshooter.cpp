@@ -36,6 +36,24 @@ size_t DynamicAllocationTroubleshooter::getFramesMaxDepth() const
     return m_framesMaxDepth;
 }
 
+size_t DynamicAllocationTroubleshooter::getStackTraceCacheSize() const
+{
+    std::lock_guard lck(m_mutex);
+    return m_stackTraceCache.size();
+}
+
+void DynamicAllocationTroubleshooter::addToStackTraceCache(const std::pair<const void*, std::string> traceRecord)
+{
+    std::lock_guard lck(m_mutex);
+    m_stackTraceCache.emplace(traceRecord);
+}
+
+void DynamicAllocationTroubleshooter::removeFromStackTraceCache(const void* traceKey)
+{
+    std::lock_guard lck(m_mutex);
+    m_stackTraceCache.erase(traceKey);
+}
+
 void DynamicAllocationTroubleshooter::enableMonitoring()
 {
     monitorAllocations = true;
@@ -56,17 +74,24 @@ void* operator new(size_t requestedSize)
     void* allocationAddress = std::malloc(requestedSize);
     if (allocationAddress)
     {
-        const auto& allocationTroubleshooter = DynamicAllocationTroubleshooter::getInstance();
+        auto& allocationTroubleshooter = DynamicAllocationTroubleshooter::getInstance();
         if (allocationTroubleshooter.isMonitoringEnabled() && !insideNewDelete)
         {
             insideNewDelete = true;
             BOOST_SCOPE_EXIT(&insideNewDelete) {
                 insideNewDelete = false;
             } BOOST_SCOPE_EXIT_END
-            std::cout << "Global operator new is called with requested size = " << requestedSize << std::endl;
+
             auto stackTrace = boost::stacktrace::stacktrace(allocationTroubleshooter.getFramesToSkip(), allocationTroubleshooter.getFramesMaxDepth());
             const auto& traceString = boost::stacktrace::detail::to_string(&stackTrace.as_vector()[0], stackTrace.size());
-            std::cout << traceString;
+            allocationTroubleshooter.addToStackTraceCache(std::pair(allocationAddress, traceString));
+
+            // HH:: TODO Add Logging flag and out stream
+            // if ()
+            // {
+            //     std::cout << "Global operator new is called with requested size = " << requestedSize << std::endl;
+            //     std::cout << traceString;
+            // }
         }
 
         return allocationAddress;
@@ -79,18 +104,24 @@ void* operator new(size_t requestedSize)
 
 void operator delete(void* ptr) noexcept
 {
-    const auto& allocationTroubleshooter = DynamicAllocationTroubleshooter::getInstance();
+    auto& allocationTroubleshooter = DynamicAllocationTroubleshooter::getInstance();
     if (allocationTroubleshooter.isMonitoringEnabled() && !insideNewDelete)
     {
         insideNewDelete = true;
         BOOST_SCOPE_EXIT(&insideNewDelete) {
             insideNewDelete = false;
         } BOOST_SCOPE_EXIT_END
-        std::cout << "Global operator delete is called" << std::endl;
         
         auto stackTrace = boost::stacktrace::stacktrace(allocationTroubleshooter.getFramesToSkip(), allocationTroubleshooter.getFramesMaxDepth());
         const auto& traceString = boost::stacktrace::detail::to_string(&stackTrace.as_vector()[0], stackTrace.size());
-        std::cout << traceString;
+        allocationTroubleshooter.removeFromStackTraceCache(ptr);
+        // HH:: TODO Add Logging flag and out stream
+        // if ()
+        // {
+        //     std::cout << "stackTraceCache.size() is " << allocationTroubleshooter.getStackTraceCacheSize() << std::endl;
+        //     std::cout << "Global operator delete is called" << std::endl;        
+        //     std::cout << traceString;
+        // }
     }
     std::free(ptr);
 }

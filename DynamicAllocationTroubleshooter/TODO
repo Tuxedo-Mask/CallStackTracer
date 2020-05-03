@@ -1,4 +1,5 @@
 1. Support caller line number printing
+    a. Add caller filename and linenumber parser
+    b. Add option to get only caller file and line number
 2. Give a way to enable/disable logging
 3. Give a way to redirrect output
-4. Add tracing info collecting mechanism
