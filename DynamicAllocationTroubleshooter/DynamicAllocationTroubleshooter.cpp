@@ -56,17 +56,27 @@ void DynamicAllocationTroubleshooter::removeFromStackTraceCache(const void* trac
 
 void DynamicAllocationTroubleshooter::enableMonitoring()
 {
-    monitorAllocations = true;
+    m_monitorAllocations = true;
 }
 
 void DynamicAllocationTroubleshooter::disableMonitoring()
 {
-    monitorAllocations = false;
+    m_monitorAllocations = false;
 }
 
 bool DynamicAllocationTroubleshooter::isMonitoringEnabled() const
 {
-    return monitorAllocations;
+    return m_monitorAllocations;
+}
+
+void DynamicAllocationTroubleshooter::setLogLevel(DynamicAllocationTroubleshooter::LogLevel logLevel)
+{
+    m_logLevel = logLevel;
+}
+
+DynamicAllocationTroubleshooter::LogLevel DynamicAllocationTroubleshooter::getLogLevel() const
+{
+    return m_logLevel;
 }
 
 void* operator new(size_t requestedSize)
@@ -86,12 +96,35 @@ void* operator new(size_t requestedSize)
             const auto& traceString = boost::stacktrace::detail::to_string(&stackTrace.as_vector()[0], stackTrace.size());
             allocationTroubleshooter.addToStackTraceCache(std::pair(allocationAddress, traceString));
 
-            // HH:: TODO Add Logging flag and out stream
-            // if ()
-            // {
-            //     std::cout << "Global operator new is called with requested size = " << requestedSize << std::endl;
-            //     std::cout << traceString;
-            // }
+            switch(allocationTroubleshooter.getLogLevel())
+            {
+                case DynamicAllocationTroubleshooter::LogLevel::Debug:
+                {
+                }
+                break;
+                case DynamicAllocationTroubleshooter::LogLevel::LogFullStackTrace:
+                {
+                }
+                break;
+                case DynamicAllocationTroubleshooter::LogLevel::LogCallerLines:
+                {
+                }
+                break;
+                case DynamicAllocationTroubleshooter::LogLevel::LogOnlyCounting:
+                {
+                    std::cout << "Operator new is called (+) " << std::endl;
+                }
+                break;                
+                case DynamicAllocationTroubleshooter::LogLevel::NoLogs:
+                {
+                }
+                break;
+                default:
+                {
+                    assert(!"New Log level is added and is unhandled");
+                }
+                break;
+            }
         }
 
         return allocationAddress;
@@ -115,13 +148,37 @@ void operator delete(void* ptr) noexcept
         auto stackTrace = boost::stacktrace::stacktrace(allocationTroubleshooter.getFramesToSkip(), allocationTroubleshooter.getFramesMaxDepth());
         const auto& traceString = boost::stacktrace::detail::to_string(&stackTrace.as_vector()[0], stackTrace.size());
         allocationTroubleshooter.removeFromStackTraceCache(ptr);
-        // HH:: TODO Add Logging flag and out stream
-        // if ()
-        // {
-        //     std::cout << "stackTraceCache.size() is " << allocationTroubleshooter.getStackTraceCacheSize() << std::endl;
-        //     std::cout << "Global operator delete is called" << std::endl;        
-        //     std::cout << traceString;
-        // }
+        
+        switch(allocationTroubleshooter.getLogLevel())
+        {
+            case DynamicAllocationTroubleshooter::LogLevel::Debug:
+            {
+            }
+            break;
+            case DynamicAllocationTroubleshooter::LogLevel::LogFullStackTrace:
+            {
+            }
+            break;
+            case DynamicAllocationTroubleshooter::LogLevel::LogCallerLines:
+            {
+            }
+            break;
+            case DynamicAllocationTroubleshooter::LogLevel::LogOnlyCounting:
+            {
+                std::cout << "Operator delete is called (-)\nstackTraceCache.size() is "
+                          << allocationTroubleshooter.getStackTraceCacheSize() << std::endl;
+            }
+            break;                
+            case DynamicAllocationTroubleshooter::LogLevel::NoLogs:
+            {
+            }
+            break;
+            default:
+            {
+                assert(!"New Log level is added and is unhandled");
+            }
+            break;
+        }
     }
     std::free(ptr);
 }

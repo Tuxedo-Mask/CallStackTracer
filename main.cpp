@@ -13,12 +13,13 @@ int main()
     allocationTroubleshooter.setFramesToSkip(1);
     allocationTroubleshooter.setFramesMaxDepth(100);
     allocationTroubleshooter.enableMonitoring();
-    int* testPtr = new int;
+    allocationTroubleshooter.setLogLevel(DynamicAllocationTroubleshooter::LogLevel::LogOnlyCounting);
+    // int* testPtr = new int;
     
-    delete testPtr;
+    // delete testPtr;
 
-    //int* testArrPtr = new int[10];
-    //delete[] testArrPtr;
+    int* testArrPtr = new int[10];
+    delete[] testArrPtr;
     // CustomAllocatedMap<int, int> vec;
     /*std::map<int, int> map;
 

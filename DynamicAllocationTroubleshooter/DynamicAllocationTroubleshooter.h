@@ -34,6 +34,10 @@ public:
 
     DynamicAllocationTroubleshooter(const DynamicAllocationTroubleshooter&) = delete;
     DynamicAllocationTroubleshooter& operator=(const DynamicAllocationTroubleshooter&) = delete;
+public:
+    enum class LogLevel {NoLogs, LogOnlyCounting, LogCallerLines, LogFullStackTrace, Debug};
+    void setLogLevel(LogLevel logLevel);
+    LogLevel getLogLevel() const;
 private:
     DynamicAllocationTroubleshooter();
     ~DynamicAllocationTroubleshooter() = default;
@@ -42,5 +46,6 @@ private:
     mutable std::mutex m_mutex;
     std::map<const void*, std::string> m_stackTraceCache;
 
-    std::atomic<bool> monitorAllocations;
+    std::atomic<LogLevel> m_logLevel = LogLevel::NoLogs;
+    std::atomic<bool> m_monitorAllocations = false;
 };
